@@ -23,6 +23,19 @@ class LineItem
   end
 end
 
+class Adjustment
+  attr_reader :amount, :currency
+  def initialize amount, currency
+    @amount, @currency = amount, currency
+  end
+  def money
+    Money.new(amount, currency)
+  end
+  def taxation
+    BigDecimal.new('0.14')
+  end
+end
+
 class Order
   attr_reader :items
   def initialize
@@ -46,6 +59,9 @@ class Order
   end
   def add_product product, quantity=1
     items << LineItem.new(product, quantity, currency)
+  end
+  def add_adjustment adjustment
+    items << adjustment
   end
   private
   def zero

@@ -4,6 +4,7 @@ describe Order do
   let(:order){ Order.new }
   subject{ order }
   context 'a new order' do
+    specify{ subject.items.should == [] }
     specify{ subject.total.should == Money.new(0.0, 'USD') }
     specify{ subject.tax_total.should == Money.new(0.0, 'USD') }
   end
@@ -19,6 +20,19 @@ describe Order do
       subject{ order.items.first }
       specify{ subject.product.should == product }
       specify{ subject.money.should == Money.new(39.99, 'USD') }
+    end
+  end
+  context 'with shipping' do
+    let(:shipping){ Adjustment.new('20.00', 'USD') }
+    before do
+      order.add_adjustment shipping
+    end
+    specify{ order.items.count.should == 1 }
+    specify{ order.item_total.should == Money.new(20.00, 'USD') }
+    specify{ order.total.should == order.item_total + order.tax_total }
+    describe "added item" do
+      subject{ order.items.first }
+      specify{ subject.money.should == Money.new(20.00, 'USD') }
     end
   end
 end
